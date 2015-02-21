@@ -1,0 +1,4 @@
+
+--
+Q: Client reports "SDL init failed: directx not available" on Windows machine
+A: Might be solved by removing SDL_VIDEODRIVER=directx environment

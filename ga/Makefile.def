@@ -1,0 +1,29 @@
+
+# Makefile.def for POSIX-based OSes
+
+OS	= $(shell uname -s)
+HAVE_X11 ?= 1
+
+CC	?= gcc
+CXX	?= g++
+AR	?= ar
+GADEPS?= $(HOME)/myprog/gaminganywhere/deps.posix
+CFLAGS	= -O2 -fPIC -g -Wall -I$(GADEPS)/include $(EXTRACFLAGS) -I/usr/local/include -DPIPELINE_FILTER
+#	-D__STDC_CONSTANT_MACROS
+LDFLAGS	= $(EXTRALDFLAGS) -L$(GADEPS)/lib -lpthread -Wl,-rpath,$$ORIGIN
+
+X11CF	?=
+X11LD	?= -lX11 -lXext -lXtst
+
+AVCCF	= -D__STDC_CONSTANT_MACROS $(shell pkg-config --cflags libswscale libswresample libpostproc libavdevice libavfilter libavcodec libavformat)
+AVCLD	= $(shell pkg-config --libs libswscale libswresample libpostproc libavdevice libavfilter libavcodec libavformat libavutil)
+
+SDLCF	= $(shell pkg-config sdl2 SDL2_ttf --cflags)
+SDLLD	= $(shell pkg-config sdl2 SDL2_ttf --libs)
+
+L5CF	= -I$(GADEPS)/include/live555
+L5LD	= -L$(GADEPS)/lib -lliveMedia -lBasicUsageEnvironment -lUsageEnvironment -lgroupsock
+
+ASNDCF	=
+ASNDLD	= -lasound
+
