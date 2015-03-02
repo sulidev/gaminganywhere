@@ -30,6 +30,12 @@
     <ClCompile Include="..\..\server\event-driven\hook-function.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\server\event-driven\ga-hook-coreaudio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\server\event-driven\ga-hook-sdlaudio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\server\event-driven\ctrl-sdl.h">
@@ -51,6 +57,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\server\event-driven\sdl12-mouse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\server\event-driven\ga-hook-coreaudio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\server\event-driven\ga-hook-sdlaudio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\server\event-driven\sdl12-audio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\server\event-driven\sdl12-video.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

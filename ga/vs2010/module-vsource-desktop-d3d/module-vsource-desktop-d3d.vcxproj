@@ -44,12 +44,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Microsoft DirectX SDK\Include;..\..\core;..\..\..\deps.win32\include;..\..\..\deps.win32\include\SDL;..\..\..\deps.win32\include\live555;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;..\..\core;..\..\..\deps.win32\include;..\..\..\deps.win32\include\SDL;..\..\..\deps.win32\include\live555;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>D3D_CAPTURE;GA_MODULE;WIN32;USE_GA_WIN32_MACRO;__STDC_CONSTANT_MACROS;FF_API_OLD_AVIO=0;PIPELINE_FILTER;_WIN32_WINNT=0x0501;NTDDI_VERSION=0x05010000;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Microsoft DirectX SDK\Lib\x86;..\..\..\deps.win32\lib;$(OutDir)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;..\..\..\deps.win32\lib;$(OutDir)</AdditionalLibraryDirectories>
       <AdditionalDependencies>d3d9.lib;d3dx9.lib;libga.lib;ws2_32.lib;SDL2.lib;swscale.lib;swresample.lib;postproc.lib;avdevice.lib;avfilter.lib;avformat.lib;avcodec.lib;avutil.lib;pthreadVC2.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)mod\$(TargetName)$(TargetExt)</OutputFile>
     </Link>
