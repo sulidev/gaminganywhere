@@ -72,7 +72,7 @@ static struct gaImage realimage, *image = &realimage;
 static struct gaRect *prect = NULL;
 static struct gaRect rect;
 
-static ga_module_t *m_filter, *m_vencoder, *m_asource, *m_aencoder, *m_ctrl, *m_server;
+static ga_module_t *m_filter, *m_vencoder, *m_asource, *m_aencoder, *m_ctrl, *m_server, *m_adaptive;
 
 int	// should be called only once
 vsource_init(int width, int height) {
@@ -222,6 +222,12 @@ load_modules() {
 	if((m_server = ga_load_module(module_path, "live555_")) == NULL)
 		return -1;
 	//////////////////////////
+	snprintf(module_path, sizeof(module_path),
+		BACKSLASHDIR("%s/mod/adaptive-stream", "%smod\\adaptive-stream"),
+		ga_root);
+	if((m_adaptive = ga_load_module(module_path, "adaptive_")) == NULL)
+		return -1;
+	//////////////////////////
 	return 0;
 }
 
@@ -231,6 +237,8 @@ init_modules() {
 	static const char *filterpipe[] =  { imagepipe0, filterpipe0 };
 	char hook_audio[64] = "";
 	//
+	ga_init_single_module_or_quit("adaptive-stream", m_adaptive, NULL);
+	///////////////////////////
 	if(conf->ctrlenable && no_default_controller==0) {
 		if(ga_init_single_module("controller", m_ctrl, (void*) prect) < 0) {
 			ga_error("******** Init controller module failed, controller disabled.\n");
@@ -254,6 +262,7 @@ init_modules() {
 	//////////////////////////
 	}
 	ga_init_single_module_or_quit("rtsp-server", m_server, NULL);
+	//////////////////////////
 	return 0;
 }
 
@@ -289,7 +298,8 @@ run_modules() {
 	}
 	// server
 	if(m_server->start(NULL) < 0)	exit(-1);
-	//
+	//////////////////////////
+	if(m_adaptive->start(NULL) < 0)	exit(-1);
 	return 0;
 }
 
