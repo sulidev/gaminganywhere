@@ -8,6 +8,7 @@
 #include "vsource.h"
 #include "ga-mediasubsession.h"
 #include "ga-liveserver.h"
+#include "../adaptive-stream/adaptive-stream.h"
 
 static UsageEnvironment* env = NULL;
 
@@ -208,12 +209,14 @@ qos_server_add_sink(const char *prefix, RTPSink *rtpsink) {
 	std::map<unsigned/*SSRC*/,qos_server_record_t> x;
 	sinkmap[rtpsink] = x;
 	ga_error("qos: add sink#%d for %s, rtpsink=%p\n", sinkmap.size(), prefix, rtpsink);
+	adaptive_add_sink(rtpsink);
 	return 0;
 }
 
 int
 qos_server_remove_sink(RTPSink *rtpsink) {
 	sinkmap.erase(rtpsink);
+	adaptive_remove_sink(rtpsink);
 	return 0;
 }
 

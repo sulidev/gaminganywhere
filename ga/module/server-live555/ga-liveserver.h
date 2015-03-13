@@ -22,6 +22,7 @@
 #include "ga-common.h"
 #include "rtspconf.h"
 #include "liveMedia.hh"
+#include <map>
 
 #define DISCRETE_FRAMER		/* use discrete framer */
 

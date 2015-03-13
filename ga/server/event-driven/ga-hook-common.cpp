@@ -223,7 +223,7 @@ load_modules() {
 		return -1;
 	//////////////////////////
 	snprintf(module_path, sizeof(module_path),
-		BACKSLASHDIR("%s/mod/adaptive-stream", "%smod\\adaptive-stream"),
+		BACKSLASHDIR("%s/adaptive-stream", "%sadaptive-stream"),
 		ga_root);
 	if((m_adaptive = ga_load_module(module_path, "adaptive_")) == NULL)
 		return -1;
