@@ -95,7 +95,7 @@ module_load() {
 	static ga_module_t m;
 	//
 	bzero(&m, sizeof(m));
-	m.type = GA_MODULE_TYPE_SERVER;
+	m.type = GA_MODULE_TYPE_NULL;
 	m.name = strdup("adaptive-stream");
 	m.init = adaptive_init;
 	m.start = adaptive_start;

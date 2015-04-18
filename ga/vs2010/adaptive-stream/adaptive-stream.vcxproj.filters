@@ -18,9 +18,15 @@
     <ClInclude Include="..\..\module\adaptive-stream\adaptive-stream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\module\adaptive-stream\adaptive-profile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\module\adaptive-stream\adaptive-stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\module\adaptive-stream\adaptive-profile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
