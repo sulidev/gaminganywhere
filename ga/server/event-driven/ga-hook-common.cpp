@@ -183,7 +183,7 @@ load_modules() {
 		return -1;
 	//
 	snprintf(module_path, sizeof(module_path),
-		BACKSLASHDIR("%s/mod/encoder-video", "%smod\\encoder-video"),
+		BACKSLASHDIR("%s/mod/encoder-video", "%smod\\encoder-x264"),
 		ga_root);
 	if((m_vencoder = ga_load_module(module_path, "vencoder_")) == NULL)
 		return -1;
@@ -237,7 +237,7 @@ init_modules() {
 	static const char *filterpipe[] =  { imagepipe0, filterpipe0 };
 	char hook_audio[64] = "";
 	//
-	ga_init_single_module_or_quit("adaptive-stream", m_adaptive, NULL);
+	ga_init_single_module_or_quit("adaptive-stream", m_adaptive, m_vencoder);
 	///////////////////////////
 	if(conf->ctrlenable && no_default_controller==0) {
 		if(ga_init_single_module("controller", m_ctrl, (void*) prect) < 0) {

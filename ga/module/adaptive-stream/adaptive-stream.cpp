@@ -1,5 +1,8 @@
-// adaptive-stream.cpp : Defines the exported functions for the DLL application.
-//
+/*
+ * Copyright (c) 2015 Suliadi Marsetya
+ *
+ *
+ */
 
 #include <stdio.h>
 #include <pthread.h>
@@ -8,11 +11,13 @@
 #include "ga-common.h"
 #include "ga-module.h"
 #include "adaptive-stream.h"
+#include "adaptive-profile.h"
 #include <set>
 
 static pthread_t adaptive_tid;
 static UsageEnvironment* env = NULL;
 static std::set<RTPSink*> sinkSet;
+static ga_module_t *vencoder;
 
 static int adaptive_init(void* arg)
 {
@@ -21,6 +26,8 @@ static int adaptive_init(void* arg)
 	freopen("CONIN$", "r", stdin);
 	freopen("CONOUT$", "w", stdout);
 	freopen("CONOUT$", "w", stderr);
+
+	vencoder = (ga_module_t*) arg;
 	return 0;
 }
 
@@ -40,6 +47,18 @@ void adaptive_remove_sink(RTPSink* sink)
 	sinkSet.erase(sink);
 }
 
+void adaptive_apply_profile(ga_ioctl_reconfigure_t params)
+{
+	int err = ga_module_ioctl(vencoder, GA_IOCTL_RECONFIGURE, sizeof(params), &params);
+	ga_error("adaptive-stream: test error code %d\n", err);
+}
+
+void adaptive_test()
+{
+	ga_error("adaptive-stream: testing reconfigure\n");
+	adaptive_apply_profile(selectProfile());
+}
+
 void adaptive_report()
 {
 	std::set<RTPSink*>::iterator it;
@@ -51,7 +70,11 @@ void adaptive_report()
 		RTPTransmissionStats *stats = NULL;
 		while((stats = statsIter.next()) != NULL)
 		{
-			ga_error("adaptive-stream: Packet lost=%d\n", stats->totNumPacketsLost());
+			ga_error("adaptive-stream: loss=%d rtt=%u (%.3fms) jitter=%u\n",
+				stats->totNumPacketsLost(),
+				stats->roundTripDelay(),
+				1000.0 * stats->roundTripDelay() / 65536,
+				stats->jitter());
 		}
 	}
 }
@@ -70,7 +93,9 @@ void* adaptive_main(void* arg)
 	TaskScheduler* scheduler = BasicTaskScheduler::createNew();
 	env = BasicUsageEnvironment::createNew(*scheduler);
 	ga_error("adaptive-stream: adaptive module started\n");
+	parseConf();
 	env->taskScheduler().scheduleDelayedTask(1000000,(TaskFunc*)adaptive_check,NULL);
+	env->taskScheduler().scheduleDelayedTask(10000000,(TaskFunc*)adaptive_test,NULL);
 	env->taskScheduler().doEventLoop();
 	return 0;
 }

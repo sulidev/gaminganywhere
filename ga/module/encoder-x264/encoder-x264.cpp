@@ -267,21 +267,30 @@ vencoder_reconfigure(int iid) {
 			params.rc.i_vbv_buffer_size = reconf->bufsize;
 			doit++;
 		}
+		if(reconf->width > 0 && reconf->height > 0){
+			params.i_width = reconf->width;
+			params.i_height = reconf->height;
+			doit++;
+		}
 		//
 		if(doit > 0) {
 			if(x264_encoder_reconfig(encoder, &params) < 0) {
-				ga_error("video encoder: reconfigure failed. crf=%d; framerate=%d/%d; bitrate=%d; bufsize=%d.\n",
+				ga_error("video encoder: reconfigure failed. crf=%d; framerate=%d/%d; bitrate=%d; bufsize=%d; res=%d*%d.\n",
 						reconf->crf,
 						reconf->framerate_n, reconf->framerate_d,
 						reconf->bitrateKbps,
-						reconf->bufsize);
+						reconf->bufsize,
+						reconf->width,
+						reconf->height);
 				ret = -1;
 			} else {
-				ga_error("video encoder: reconfigured. crf=%.2f; framerate=%d/%d; bitrate=%d/%dKbps; bufsize=%dKbit.\n",
+				ga_error("video encoder: reconfigured. crf=%.2f; framerate=%d/%d; bitrate=%d/%dKbps; bufsize=%dKbit; res=%d*%d.\n",
 						params.rc.f_rf_constant,
 						params.i_fps_num, params.i_fps_den,
 						params.rc.i_bitrate, params.rc.i_vbv_max_bitrate,
-						params.rc.i_vbv_buffer_size);
+						params.rc.i_vbv_buffer_size,
+						params.i_width,
+						params.i_height);
 			}
 		}
 		reconf->id = -1;

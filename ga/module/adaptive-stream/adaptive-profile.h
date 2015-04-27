@@ -7,21 +7,20 @@
 #ifndef __ADAPTIVEPROFILE_H__
 #define __ADAPTIVEPROFILE_H__
 
-#include <list>
-
 class adaptiveProfile
 {
 public:
-	int packetLoss;
-	float rtt;
+	int loss;
+	int rtt;
 	int jitter;
 	int crf;
-	float fps;
-	long bitrate;
-	long vbv;
+	int fps;
+	int bitrate;
+	int vbv;
 };
 
-bool parseConf(char*);
+bool parseConf();
 void reportConf();
+ga_ioctl_reconfigure_t selectProfile();
 
 #endif

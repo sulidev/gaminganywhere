@@ -67,7 +67,7 @@
       <SubSystem>
       </SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <OutputFile>$(OutDir)mod\$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\deps.win32\lib;$(OutDir)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libga.lib;ws2_32.lib;SDL2.lib;swscale.lib;swresample.lib;postproc.lib;avdevice.lib;avfilter.lib;avformat.lib;avcodec.lib;avutil.lib;libliveMedia.d.lib;libgroupsock.d.lib;libBasicUsageEnvironment.d.lib;libUsageEnvironment.d.lib;pthreadVC2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>

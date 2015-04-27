@@ -1,5 +1,6 @@
 /*
- *	adaptive-stream.cpp header file
+ * Copyright (c) 2015 Suliadi Marsetya
+ *
  *
  */
 
