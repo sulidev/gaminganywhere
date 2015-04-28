@@ -95,7 +95,7 @@ void* adaptive_main(void* arg)
 	ga_error("adaptive-stream: adaptive module started\n");
 	parseConf();
 	env->taskScheduler().scheduleDelayedTask(1000000,(TaskFunc*)adaptive_check,NULL);
-	env->taskScheduler().scheduleDelayedTask(10000000,(TaskFunc*)adaptive_test,NULL);
+	env->taskScheduler().scheduleDelayedTask(30000000,(TaskFunc*)adaptive_test,NULL);
 	env->taskScheduler().doEventLoop();
 	return 0;
 }

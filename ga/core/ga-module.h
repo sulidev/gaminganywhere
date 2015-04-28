@@ -92,8 +92,8 @@ typedef struct ga_ioctl_reconfigure_s {
 	int framerate_d;	/**< Framerate denominator */
 	int bitrateKbps;	/**< bitrate in Kbit-per-second. Affects both bitrate and vbv-maxrate */
 	int bufsize;		/**< vbv-bufsize */
-	int width;			/**< experimental width */
-	int height;			/**< experimental height */
+	//int width;			/**< experimental width */
+	//int height;			/**< experimental height */
 }	ga_ioctl_reconfigure_t;
 
 #ifdef __cplusplus

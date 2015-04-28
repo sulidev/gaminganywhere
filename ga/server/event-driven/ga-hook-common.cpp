@@ -183,7 +183,7 @@ load_modules() {
 		return -1;
 	//
 	snprintf(module_path, sizeof(module_path),
-		BACKSLASHDIR("%s/mod/encoder-video", "%smod\\encoder-x264"),
+		BACKSLASHDIR("%s/mod/encoder-x264", "%smod\\encoder-x264"),
 		ga_root);
 	if((m_vencoder = ga_load_module(module_path, "vencoder_")) == NULL)
 		return -1;

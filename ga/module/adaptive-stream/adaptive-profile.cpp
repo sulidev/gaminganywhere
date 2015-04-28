@@ -58,12 +58,16 @@ ga_ioctl_reconfigure_t createParam(adaptiveProfile ap)
 	params.crf = ap.crf;
 	params.framerate_n = ap.fps;
 	params.framerate_d = 1;
-	params.width = 320;
-	params.height = 240;
 	return params;
 }
 
 ga_ioctl_reconfigure_t selectProfile()
 {
-	return createParam(*aps.begin());
+	std::list<adaptiveProfile>::iterator it;
+	it=aps.begin()++;
+	it++;
+	it++;
+	it++;
+	it++;
+	return createParam(*it);
 }
