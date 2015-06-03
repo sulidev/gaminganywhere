@@ -1,0 +1,35 @@
+input variable: loss, delay, jitter.
+output variable: quality.
+
+loss {low, high} [0% 100%] (pkts_loss/pkts_sent)
+delay {low, high} [1ms 1000ms]
+jitter {low, high} []
+
+quality {very low, low, medium, high, very high}
+quality=[crf, fps, bitrate, vbv]
+
+LOW<--------------->HIGH
+crf={50,40,30,20,10}
+bitrate={300,500,1000,2000,3000}
+vbv={125,325,425,525,625}
+
+[FUZZY CRF]
+if LOSS is LOW and DELAY is LOW and JITTER is LOW then CRF is VERY HIGH
+if LOSS is LOW and DELAY is LOW and JITTER is HIGH then CRF is HIGH
+if LOSS is HIGH and DELAY is LOW and JITTER is LOW then CRF is MEDIUM
+if LOSS is HIGH and DELAY is HIGH and JITTER is LOW then CRF is LOW
+if LOSS is HIGH and DELAY is HIGH and JITTER is HIGH then CRF is VERY LOW
+
+[FUZZY BITRATE]
+if LOSS is LOW and DELAY is LOW and JITTER is LOW then BITRATE is VERY HIGH
+if LOSS is LOW and DELAY is LOW and JITTER is HIGH then BITRATE is HIGH
+if LOSS is HIGH and DELAY is LOW and JITTER is LOW then BITRATE is MEDIUM
+if LOSS is HIGH and DELAY is HIGH and JITTER is LOW then BITRATE is LOW
+if LOSS is HIGH and DELAY is HIGH and JITTER is HIGH then BITRATE is VERY LOW
+
+[FUZZY VBV]
+if LOSS is LOW and DELAY is LOW and JITTER is LOW then VBV is VERY HIGH
+if LOSS is LOW and DELAY is LOW and JITTER is HIGH then VBV is HIGH
+if LOSS is HIGH and DELAY is LOW and JITTER is LOW then VBV is MEDIUM
+if LOSS is HIGH and DELAY is HIGH and JITTER is LOW then VBV is LOW
+if LOSS is HIGH and DELAY is HIGH and JITTER is HIGH then VBV is VERY LOW
