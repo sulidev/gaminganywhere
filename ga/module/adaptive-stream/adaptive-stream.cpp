@@ -53,9 +53,10 @@ void adaptive_apply_profile(ga_ioctl_reconfigure_t params)
 	ga_error("adaptive-stream: test error code %d\n", err);
 }
 
-void adaptive_test()
+void adaptive_measure()
 {
-	ga_error("adaptive-stream: testing reconfigure\n");
+	ga_error("adaptive-stream: reconfigure\n");
+	//if condition here
 	adaptive_apply_profile(selectProfile());
 }
 
@@ -70,11 +71,23 @@ void adaptive_report()
 		RTPTransmissionStats *stats = NULL;
 		while((stats = statsIter.next()) != NULL)
 		{
-			ga_error("adaptive-stream: loss=%d rtt=%u (%.3fms) jitter=%u\n",
-				stats->totNumPacketsLost(),
-				stats->roundTripDelay(),
-				1000.0 * stats->roundTripDelay() / 65536,
-				stats->jitter());
+			unsigned long long pkts_lost, pkts_sent;
+			unsigned pkts_sent_hi, pkts_sent_lo;
+			unsigned rtt, jitter;
+
+			stats->getTotalPacketCount(pkts_sent_hi, pkts_sent_lo);
+			pkts_sent = pkts_sent_hi;
+			pkts_sent = (pkts_sent << 32) | pkts_sent_lo;
+			pkts_lost = stats->totNumPacketsLost()>pkts_sent?0:stats->totNumPacketsLost();
+			rtt = stats->roundTripDelay();
+			jitter = stats->jitter();
+
+			ga_error("adaptive-stream: loss=%d/%d rtt=%u (%.3fms) jitter=%u\n",
+				pkts_lost,
+				pkts_sent,
+				rtt,
+				1000.0 * rtt / 65536,
+				jitter);
 		}
 	}
 }
@@ -93,9 +106,8 @@ void* adaptive_main(void* arg)
 	TaskScheduler* scheduler = BasicTaskScheduler::createNew();
 	env = BasicUsageEnvironment::createNew(*scheduler);
 	ga_error("adaptive-stream: adaptive module started\n");
-	parseConf();
+	profileMain();
 	env->taskScheduler().scheduleDelayedTask(1000000,(TaskFunc*)adaptive_check,NULL);
-	env->taskScheduler().scheduleDelayedTask(30000000,(TaskFunc*)adaptive_test,NULL);
 	env->taskScheduler().doEventLoop();
 	return 0;
 }
