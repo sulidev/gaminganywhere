@@ -53,13 +53,6 @@ void adaptive_apply_profile(ga_ioctl_reconfigure_t params)
 	ga_error("adaptive-stream: test error code %d\n", err);
 }
 
-void adaptive_measure()
-{
-	ga_error("adaptive-stream: reconfigure\n");
-	//if condition here
-	adaptive_apply_profile(selectProfile());
-}
-
 void adaptive_report()
 {
 	std::set<RTPSink*>::iterator it;
@@ -88,6 +81,8 @@ void adaptive_report()
 				rtt,
 				1000.0 * rtt / 65536,
 				jitter);
+
+			selectProfile(pkts_lost,rtt,jitter);
 		}
 	}
 }
