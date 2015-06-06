@@ -29,7 +29,7 @@ void test()
 {
 	ga_error("adaptive-stream: input variables count: %d\n",engine->numberOfInputVariables());
 	ga_error("adaptive-stream: output variables count: %d\n",engine->numberOfOutputVariables());
-	ga_error("adaptive-stream: rules count: %d\n",engine->numberOfRuleBlocks());
+	ga_error("adaptive-stream: ruleblocks count: %d\n",engine->numberOfRuleBlocks());
 }
 
 void parseTerm(std::string tmp, std::string key, int type, fl::Variable* var)
@@ -75,8 +75,8 @@ bool parseConf()
 		input->setEnabled(true);
 		std::string tmp =  concatStr("adaptive-input", inNum);
 		input->setName(ga_conf_mapreadv(tmp.c_str(),"name",NULL,10));
-		input->setRange(0.000, 1.000);
-
+		input->setRange(ga_conf_mapreaddouble(tmp.c_str(),"range-min"), ga_conf_mapreaddouble(tmp.c_str(),"range-max"));
+		ga_error("adaptive-stream: range: %f, %f\n",ga_conf_mapreaddouble(tmp.c_str(),"range-min"), ga_conf_mapreaddouble(tmp.c_str(),"range-max"));
 		int termNum = ga_conf_mapreadint(tmp.c_str(),"term-num");
 		while(termNum>0)
 		{
@@ -97,7 +97,13 @@ bool parseConf()
 		output->setEnabled(true);
 		std::string tmp = concatStr("adaptive-output", outNum);
 		output->setName(ga_conf_mapreadv(tmp.c_str(),"name",NULL,10));
-		output->setRange(0.000, 1.000);
+		output->setRange(ga_conf_mapreaddouble(tmp.c_str(),"range-min"), ga_conf_mapreaddouble(tmp.c_str(),"range-max"));
+		ga_error("adaptive-stream: range: %f, %f\n",ga_conf_mapreaddouble(tmp.c_str(),"range-min"), ga_conf_mapreaddouble(tmp.c_str(),"range-max"));
+		//output->fuzzyOutput()->setAccumulation(new fl::Maximum());
+		//output->setDefuzzifier(new fl::Centroid(200));
+		output->setDefaultValue(fl::nan);
+		output->setLockPreviousOutputValue(false);
+		output->setLockOutputValueInRange(false);
 
 		int termNum = ga_conf_mapreadint(tmp.c_str(),"term-num");
 		while(termNum>0)
@@ -116,6 +122,9 @@ bool parseConf()
 	fl::RuleBlock* rules = new fl::RuleBlock;
 	rules->setEnabled(true);
 	rules->setName("");
+	//rules->setConjunction(new fl::Minimum());
+	//rules->setDisjunction(new fl::Maximum());
+	//rules->setActivation(new fl::Minimum());
 
 	while(ruleNum>0)
 	{
@@ -128,8 +137,13 @@ bool parseConf()
 	engine->addRuleBlock(rules);
 	ga_error("adaptive-stream: rules loaded\n");
 
-	engine->configure(new fl::AlgebraicProduct, new fl::AlgebraicSum, new fl::AlgebraicProduct, new fl::AlgebraicSum, new fl::Centroid);
+	engine->configure("Minimum","Maximum","Minimum","Maximum","Centroid");
+	//engine->configure("AlgebraicProduct", "AlgebraicSum", "AlgebraicProduct", "AlgebraicSum", "Centroid");
 
+	std::string status;
+    if (!engine->isReady(&status))
+		std::cout << "adaptive-stream: error: " << status << std::endl;
+	
 	test();
 	return true;
 }
@@ -145,47 +159,50 @@ void profileMain()
 ga_ioctl_reconfigure_t createParam()
 {
 	fl::scalar Crf, Bitrate, Vbv;
+
+	engine->process();
 	for(int i=0; i<listOutput.size(); i++)
 	{
 		if(listOutput[i]->getName() == "Crf"){
-			//listOutput[i]->defuzzify();
 			Crf = listOutput[i]->getOutputValue();
-			ga_error("adaptive-stream: Crf: %s\n", fl::Op::str(Crf));
+			std::cout << "adaptive-stream: Crf: " << fl::Op::str(Crf) << std::endl;
 		}else if(listOutput[i]->getName() == "Bitrate"){
 			Bitrate = listOutput[i]->getOutputValue();
-			ga_error("adaptive-stream: Bitrate: %s\n", fl::Op::str(Bitrate));
+			std::cout << "adaptive-stream: Bitrate: " << fl::Op::str(Bitrate) << std::endl;
 		}else if(listOutput[i]->getName() == "Vbv"){
 			Vbv = listOutput[i]->getOutputValue();
-			ga_error("adaptive-stream: Vbv-Buffer: %s\n", fl::Op::str(Vbv));
+			std::cout << "adaptive-stream: Vbv-Buffer: " << fl::Op::str(Vbv) << std::endl;
 		}
 	}
 	ga_ioctl_reconfigure_t params;
 	params.id = 0;
-	params.bitrateKbps = Bitrate;
-	params.bufsize = Vbv;
-	params.crf = Crf;
+	params.bitrateKbps = (int) Bitrate;
+	params.bufsize = (int) Vbv;
+	params.crf = (int) Crf;
 	params.framerate_n = 60;
 	params.framerate_d = 1;
 	return params;
 }
 
-ga_ioctl_reconfigure_t selectProfile(fl::scalar loss, fl::scalar delay, fl::scalar jitter) //input loss, delay, jitter
+ga_ioctl_reconfigure_t selectProfile(float loss, float delay, unsigned jitter) //input loss, delay, jitter
 {
-	ga_error("adaptive-stream: reconfigure %s %s %s\n", fl::Op::str(loss), fl::Op::str(delay), fl::Op::str(jitter));
+	ga_error("adaptive-stream: reconfigure %.3f %.3f %u\n", loss, delay, jitter);
 
 	for(int i=0; i<listInput.size(); i++)
 	{
 		if(listInput[i]->getName() == "Loss"){
-			listInput[i]->setInputValue(loss);
-			ga_error("adaptive-stream: Loss: %d\n", fl::Op::str(listInput[i]->getInputValue()));
+			fl::scalar sloss = listInput[i]->getMinimum() + loss + 0.1;
+			listInput[i]->setInputValue(sloss);
+			std::cout << "adaptive-stream: Loss: " << fl::Op::str(sloss) << std::endl;
 		}else if(listInput[i]->getName() == "Delay"){
-			listInput[i]->setInputValue(delay);
-			ga_error("adaptive-stream: Delay: %d\n", fl::Op::str(listInput[i]->getInputValue()));
+			fl::scalar sdelay = listInput[i]->getMinimum() + delay;
+			listInput[i]->setInputValue(sdelay);
+			std::cout << "adaptive-stream: Delay: " << fl::Op::str(sdelay) << std::endl;
 		}else if(listInput[i]->getName() == "Jitter"){
-			listInput[i]->setInputValue(jitter);
-			ga_error("adaptive-stream: Jitter: %d\n", fl::Op::str(listInput[i]->getInputValue()));
+			fl::scalar sjitt = listInput[i]->getMinimum() + jitter;
+			listInput[i]->setInputValue(sjitt);
+			std::cout << "adaptive-stream: Jitter: " << fl::Op::str(sjitt) << std::endl;
 		}
 	}
-	engine->process();
 	return createParam();
 }

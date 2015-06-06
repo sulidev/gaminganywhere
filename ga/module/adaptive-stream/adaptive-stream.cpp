@@ -16,7 +16,6 @@
 
 static pthread_t adaptive_tid;
 static UsageEnvironment* env = NULL;
-static std::set<RTPSink*> sinkSet;
 static ga_module_t *vencoder;
 
 static int adaptive_init(void* arg)
@@ -37,61 +36,11 @@ static int adaptive_deinit(void* arg)
 	return 0;
 }
 
-void adaptive_add_sink(RTPSink* sink)
+void adaptive_reconfigure(float loss, float rtt, unsigned jitter)
 {
-	sinkSet.insert(sink);
-}
-
-void adaptive_remove_sink(RTPSink* sink)
-{
-	sinkSet.erase(sink);
-}
-
-void adaptive_apply_profile(ga_ioctl_reconfigure_t params)
-{
+	ga_ioctl_reconfigure_t params = selectProfile(loss,rtt,jitter);
 	int err = ga_module_ioctl(vencoder, GA_IOCTL_RECONFIGURE, sizeof(params), &params);
 	ga_error("adaptive-stream: test error code %d\n", err);
-}
-
-void adaptive_report()
-{
-	std::set<RTPSink*>::iterator it;
-	for(it=sinkSet.begin(); it!=sinkSet.end(); it++)
-	{
-		RTPSink* temp = *it;
-		RTPTransmissionStatsDB& db = temp->transmissionStatsDB();
-		RTPTransmissionStatsDB::Iterator statsIter(db);
-		RTPTransmissionStats *stats = NULL;
-		while((stats = statsIter.next()) != NULL)
-		{
-			unsigned long long pkts_lost, pkts_sent;
-			unsigned pkts_sent_hi, pkts_sent_lo;
-			unsigned rtt, jitter;
-
-			stats->getTotalPacketCount(pkts_sent_hi, pkts_sent_lo);
-			pkts_sent = pkts_sent_hi;
-			pkts_sent = (pkts_sent << 32) | pkts_sent_lo;
-			pkts_lost = stats->totNumPacketsLost()>pkts_sent?0:stats->totNumPacketsLost();
-
-			ga_error("adaptive-stream: loss=%d/%d rtt=%u (%.3fms) jitter=%u\n",
-				pkts_lost,
-				pkts_sent,
-				stats->roundTripDelay(),
-				(1000.0 * stats->roundTripDelay() / 65536),
-				stats->jitter());
-
-			selectProfile(100,100,100);
-		}
-	}
-}
-
-void adaptive_check()
-{
-	if(sinkSet.size()>0)
-		adaptive_report();
-	else
-		ga_error("adaptive-stream: waiting sinks\n");
-	env->taskScheduler().scheduleDelayedTask(1000000,(TaskFunc*)adaptive_check,NULL);
 }
 
 void* adaptive_main(void* arg)
@@ -100,7 +49,6 @@ void* adaptive_main(void* arg)
 	env = BasicUsageEnvironment::createNew(*scheduler);
 	ga_error("adaptive-stream: adaptive module started\n");
 	profileMain();
-	env->taskScheduler().scheduleDelayedTask(1000000,(TaskFunc*)adaptive_check,NULL);
 	env->taskScheduler().doEventLoop();
 	return 0;
 }

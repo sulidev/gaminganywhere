@@ -7,15 +7,7 @@
 #ifndef __ADAPTIVEPROFILE_H__
 #define __ADAPTIVEPROFILE_H__
 
-class Profile{
-public:
-	int crf;
-	int bitrate;
-	int vbv;
-	int fps;
-};
-
 void profileMain();
-ga_ioctl_reconfigure_t selectProfile(int, int, int);
+ga_ioctl_reconfigure_t selectProfile(float, float, unsigned);
 
 #endif
