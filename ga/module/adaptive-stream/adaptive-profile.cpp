@@ -144,19 +144,19 @@ void profileMain()
 
 ga_ioctl_reconfigure_t createParam()
 {
-	int Crf, Bitrate, Vbv;
+	fl::scalar Crf, Bitrate, Vbv;
 	for(int i=0; i<listOutput.size(); i++)
 	{
 		if(listOutput[i]->getName() == "Crf"){
 			//listOutput[i]->defuzzify();
 			Crf = listOutput[i]->getOutputValue();
-			ga_error("adaptive-stream: Crf: %d", Crf);
+			ga_error("adaptive-stream: Crf: %s\n", fl::Op::str(Crf));
 		}else if(listOutput[i]->getName() == "Bitrate"){
 			Bitrate = listOutput[i]->getOutputValue();
-			ga_error("adaptive-stream: Bitrate: %d", Bitrate);
+			ga_error("adaptive-stream: Bitrate: %s\n", fl::Op::str(Bitrate));
 		}else if(listOutput[i]->getName() == "Vbv"){
 			Vbv = listOutput[i]->getOutputValue();
-			ga_error("adaptive-stream: Vbv-Buffer: %d", Vbv);
+			ga_error("adaptive-stream: Vbv-Buffer: %s\n", fl::Op::str(Vbv));
 		}
 	}
 	ga_ioctl_reconfigure_t params;
@@ -169,21 +169,21 @@ ga_ioctl_reconfigure_t createParam()
 	return params;
 }
 
-ga_ioctl_reconfigure_t selectProfile(int loss, int delay, int jitter) //input loss, delay, jitter
+ga_ioctl_reconfigure_t selectProfile(fl::scalar loss, fl::scalar delay, fl::scalar jitter) //input loss, delay, jitter
 {
-	ga_error("adaptive-stream: reconfigure\n");
+	ga_error("adaptive-stream: reconfigure %s %s %s\n", fl::Op::str(loss), fl::Op::str(delay), fl::Op::str(jitter));
 
 	for(int i=0; i<listInput.size(); i++)
 	{
 		if(listInput[i]->getName() == "Loss"){
 			listInput[i]->setInputValue(loss);
-			ga_error("adaptive-stream: Loss: %d", listInput[i]->getInputValue());
+			ga_error("adaptive-stream: Loss: %d\n", fl::Op::str(listInput[i]->getInputValue()));
 		}else if(listInput[i]->getName() == "Delay"){
 			listInput[i]->setInputValue(delay);
-			ga_error("adaptive-stream: Delay: %d", listInput[i]->getInputValue());
+			ga_error("adaptive-stream: Delay: %d\n", fl::Op::str(listInput[i]->getInputValue()));
 		}else if(listInput[i]->getName() == "Jitter"){
 			listInput[i]->setInputValue(jitter);
-			ga_error("adaptive-stream: Jitter: %d", listInput[i]->getInputValue());
+			ga_error("adaptive-stream: Jitter: %d\n", fl::Op::str(listInput[i]->getInputValue()));
 		}
 	}
 	engine->process();

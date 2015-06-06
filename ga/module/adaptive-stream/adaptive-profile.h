@@ -15,13 +15,6 @@ public:
 	int fps;
 };
 
-class Stat{
-public:
-	int loss;
-	int delay;
-	int jitter;
-};
-
 void profileMain();
 ga_ioctl_reconfigure_t selectProfile(int, int, int);
 

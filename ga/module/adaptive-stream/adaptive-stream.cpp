@@ -72,17 +72,15 @@ void adaptive_report()
 			pkts_sent = pkts_sent_hi;
 			pkts_sent = (pkts_sent << 32) | pkts_sent_lo;
 			pkts_lost = stats->totNumPacketsLost()>pkts_sent?0:stats->totNumPacketsLost();
-			rtt = stats->roundTripDelay();
-			jitter = stats->jitter();
 
 			ga_error("adaptive-stream: loss=%d/%d rtt=%u (%.3fms) jitter=%u\n",
 				pkts_lost,
 				pkts_sent,
-				rtt,
-				1000.0 * rtt / 65536,
-				jitter);
+				stats->roundTripDelay(),
+				(1000.0 * stats->roundTripDelay() / 65536),
+				stats->jitter());
 
-			selectProfile(pkts_lost,rtt,jitter);
+			selectProfile(100,100,100);
 		}
 	}
 }
