@@ -64,6 +64,20 @@ void parseTerm(std::string tmp, std::string key, int type, fl::Variable* var)
 			ga_conf_mapreaddouble(tmp.c_str(),(key+"-point2").c_str())));
 		//ga_error("adaptive-stream: ramp term\n");
 	}
+	else if(strcmp(ga_conf_mapreadv(tmp.c_str(),(key+"-type").c_str(),NULL,16),"zshape")==0)
+	{
+		var->addTerm(new fl::ZShape(ga_conf_mapreadv(tmp.c_str(),(key+"-name").c_str(),NULL,10),
+			ga_conf_mapreaddouble(tmp.c_str(),(key+"-point1").c_str()),
+			ga_conf_mapreaddouble(tmp.c_str(),(key+"-point2").c_str())));
+		//ga_error("adaptive-stream: zshape term\n");
+	}
+	else if(strcmp(ga_conf_mapreadv(tmp.c_str(),(key+"-type").c_str(),NULL,16),"sshape")==0)
+	{
+		var->addTerm(new fl::SShape(ga_conf_mapreadv(tmp.c_str(),(key+"-name").c_str(),NULL,10),
+			ga_conf_mapreaddouble(tmp.c_str(),(key+"-point1").c_str()),
+			ga_conf_mapreaddouble(tmp.c_str(),(key+"-point2").c_str())));
+		//ga_error("adaptive-stream: sshape term\n");
+	}
 }
 
 bool parseConf()
@@ -198,7 +212,7 @@ ga_ioctl_reconfigure_t selectProfile(float loss, float delay, unsigned jitter) /
 	for(int i=0; i<listInput.size(); i++)
 	{
 		if(listInput[i]->getName() == "Loss"){
-			fl::scalar sloss = listInput[i]->getMinimum() + loss + 0.001;
+			fl::scalar sloss = listInput[i]->getMinimum() + loss + 0.000001;
 			listInput[i]->setInputValue(sloss);
 			std::cout << "adaptive-stream: Loss: " << fl::Op::str(sloss) << std::endl;
 		}else if(listInput[i]->getName() == "Delay"){
