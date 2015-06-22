@@ -27,7 +27,7 @@
 #define DISCRETE_FRAMER		/* use discrete framer */
 
 #define	QOS_SERVER_CHECK_INTERVAL_MS	(1 * 1000)	/* check every N seconds */
-#define	QOS_SERVER_REPORT_INTERVAL_MS	(10 * 1000)	/* report every N seconds */
+#define	QOS_SERVER_REPORT_INTERVAL_MS	(1 * 1000)	/* report every N seconds */
 #define QOS_SERVER_PREFIX_LEN		64
 
 typedef struct qos_server_record_s {

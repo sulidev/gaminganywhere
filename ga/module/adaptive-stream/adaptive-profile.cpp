@@ -25,16 +25,8 @@ std::string concatStr(char* str, int i)
 	return sstm.str();
 }
 
-void test()
-{
-	ga_error("adaptive-stream: input variables count: %d\n",engine->numberOfInputVariables());
-	ga_error("adaptive-stream: output variables count: %d\n",engine->numberOfOutputVariables());
-	ga_error("adaptive-stream: ruleblocks count: %d\n",engine->numberOfRuleBlocks());
-}
-
 void parseTerm(std::string tmp, std::string key, int type, fl::Variable* var)
 {
-	ga_error("adaptive-stream: parsing term\n");
 	if(type==0)
 		var = (fl::InputVariable*) var;
 	else
@@ -86,9 +78,9 @@ bool parseConf()
 	int outNum = ga_conf_readint("adaptive-output-num");
 	int ruleNum = ga_conf_readint("adaptive-rule-num");
 	
-	ga_error("adaptive-stream: fuzzy input = %d\n", inNum);
-	ga_error("adaptive-stream: fuzzy output = %d\n", outNum);
-	ga_error("adaptive-stream: fuzzy rules = %d\n", ruleNum);
+	printf("adaptive-stream: fuzzy input = %d\n", inNum);
+	printf("adaptive-stream: fuzzy output = %d\n", outNum);
+	printf("adaptive-stream: fuzzy rules = %d\n", ruleNum);
 
 	while(inNum>0)
 	{
@@ -97,7 +89,7 @@ bool parseConf()
 		std::string tmp =  concatStr("adaptive-input", inNum);
 		input->setName(ga_conf_mapreadv(tmp.c_str(),"name",NULL,10));
 		input->setRange(ga_conf_mapreaddouble(tmp.c_str(),"range-min"), ga_conf_mapreaddouble(tmp.c_str(),"range-max"));
-		ga_error("adaptive-stream: range: %f, %f\n",ga_conf_mapreaddouble(tmp.c_str(),"range-min"), ga_conf_mapreaddouble(tmp.c_str(),"range-max"));
+		printf("adaptive-stream: range: %f, %f\n",ga_conf_mapreaddouble(tmp.c_str(),"range-min"), ga_conf_mapreaddouble(tmp.c_str(),"range-max"));
 		int termNum = ga_conf_mapreadint(tmp.c_str(),"term-num");
 		while(termNum>0)
 		{
@@ -110,7 +102,7 @@ bool parseConf()
 		inNum--;
 	}
 
-	ga_error("adaptive-stream: input loaded\n");
+	printf("adaptive-stream: input loaded\n");
 
 	while(outNum>0)
 	{
@@ -119,7 +111,7 @@ bool parseConf()
 		std::string tmp = concatStr("adaptive-output", outNum);
 		output->setName(ga_conf_mapreadv(tmp.c_str(),"name",NULL,10));
 		output->setRange(ga_conf_mapreaddouble(tmp.c_str(),"range-min"), ga_conf_mapreaddouble(tmp.c_str(),"range-max"));
-		ga_error("adaptive-stream: range: %f, %f\n",ga_conf_mapreaddouble(tmp.c_str(),"range-min"), ga_conf_mapreaddouble(tmp.c_str(),"range-max"));
+		printf("adaptive-stream: range: %f, %f\n",ga_conf_mapreaddouble(tmp.c_str(),"range-min"), ga_conf_mapreaddouble(tmp.c_str(),"range-max"));
 		//output->fuzzyOutput()->setAccumulation(new fl::Maximum());
 		//output->setDefuzzifier(new fl::Centroid(200));
 		output->setDefaultValue(fl::nan);
@@ -138,7 +130,7 @@ bool parseConf()
 		outNum--;
 	}
 	
-	ga_error("adaptive-stream: output loaded\n");
+	printf("adaptive-stream: output loaded\n");
 
 	fl::RuleBlock* rules = new fl::RuleBlock;
 	rules->setEnabled(true);
@@ -151,12 +143,12 @@ bool parseConf()
 	{
 		std::string key = concatStr("adaptive-rule", ruleNum);
 		std::string set = std::string(ga_conf_readv(key.c_str(),NULL,128));
-		ga_error("adaptive-stream: %s\n",set.c_str());
+		printf("adaptive-stream: %s\n",set.c_str());
 		rules->addRule(fl::Rule::parse(set, engine));
 		ruleNum--;
 	}
 	engine->addRuleBlock(rules);
-	ga_error("adaptive-stream: rules loaded\n");
+	printf("adaptive-stream: rules loaded\n");
 
 	engine->configure("Minimum","Maximum","Minimum","Maximum","Centroid");
 	//engine->configure("AlgebraicProduct", "AlgebraicSum", "AlgebraicProduct", "AlgebraicSum", "Centroid");
@@ -165,13 +157,12 @@ bool parseConf()
     if (!engine->isReady(&status))
 		std::cout << "adaptive-stream: error: " << status << std::endl;
 	
-	test();
 	return true;
 }
 
 void profileMain()
 {
-	ga_error("adaptive-stream: Fuzzy engine init\n");
+	printf("adaptive-stream: Fuzzy engine init\n");
 	engine = new fl::Engine;
 	engine->setName("Adaptive-stream");
 	parseConf();
@@ -179,9 +170,10 @@ void profileMain()
 
 ga_ioctl_reconfigure_t createParam()
 {
-	fl::scalar Crf, Bitrate, Vbv;
+	fl::scalar Crf=-1, Bitrate=-1, Vbv=-1;
 
 	engine->process();
+	printf("adaptive-stream: ---------Target parameter-----------\n");
 	for(int i=0; i<listOutput.size(); i++)
 	{
 		if(listOutput[i]->getName() == "Crf"){
@@ -195,20 +187,21 @@ ga_ioctl_reconfigure_t createParam()
 			std::cout << "adaptive-stream: Vbv-Buffer: " << fl::Op::str(Vbv) << std::endl;
 		}
 	}
+	printf("adaptive-stream: ------------------------------------\n");
 	ga_ioctl_reconfigure_t params;
 	params.id = 0;
 	params.bitrateKbps = (int) Bitrate;
-	params.bufsize = (int) Vbv;
 	params.crf = (int) Crf;
+	params.bufsize = (int)Vbv>0?(int)Vbv:625;
 	params.framerate_n = 60;
 	params.framerate_d = 1;
 	return params;
 }
 
 ga_ioctl_reconfigure_t selectProfile(float loss, float delay, unsigned jitter) //input loss, delay, jitter
-{
-	ga_error("adaptive-stream: reconfigure %.3f %.3f %u\n", loss, delay, jitter);
-
+{ 
+	printf("adaptive-stream: reconfigure %.3f %.3f %u\n", loss, delay, jitter);
+	printf("adaptive-stream: ----Network Condition Statistics----\n");
 	for(int i=0; i<listInput.size(); i++)
 	{
 		if(listInput[i]->getName() == "Loss"){
@@ -225,5 +218,6 @@ ga_ioctl_reconfigure_t selectProfile(float loss, float delay, unsigned jitter) /
 			std::cout << "adaptive-stream: Jitter: " << fl::Op::str(sjitt) << std::endl;
 		}
 	}
+	printf("adaptive-stream: ------------------------------------\n");
 	return createParam();
 }
