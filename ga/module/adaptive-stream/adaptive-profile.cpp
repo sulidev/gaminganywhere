@@ -13,6 +13,8 @@
 #include "ga-module.h"
 #include "adaptive-profile.h"
 #include <vector>
+#include <iostream>
+#include <fstream>
 
 fl::Engine* engine;
 std::vector<fl::InputVariable*> listInput;
@@ -23,6 +25,14 @@ std::string concatStr(char* str, int i)
 	std::stringstream sstm;
 	sstm << str << i;
 	return sstm.str();
+}
+
+void writeLog(std::string str[])
+{
+	std::ofstream logfile;
+	logfile.open("D:\\adaptive-log.txt", std::ios::out | std::ios::app);
+	logfile << str[0] << "," << str[1] << "," << str[2] << std::endl;
+	logfile.close();
 }
 
 void parseTerm(std::string tmp, std::string key, int type, fl::Variable* var)
@@ -198,9 +208,10 @@ ga_ioctl_reconfigure_t createParam()
 	return params;
 }
 
-ga_ioctl_reconfigure_t selectProfile(float loss, float delay, unsigned jitter) //input loss, delay, jitter
-{ 
-	printf("adaptive-stream: reconfigure %.3f %.3f %u\n", loss, delay, jitter);
+ga_ioctl_reconfigure_t selectProfile(float loss, float rtt, unsigned jitter) //input loss, delay, jitter
+{
+	std::string stat[3];
+	printf("adaptive-stream: reconfigure %.3f %.3f %u\n", loss, rtt, jitter);
 	printf("adaptive-stream: ----Network Condition Statistics----\n");
 	for(int i=0; i<listInput.size(); i++)
 	{
@@ -208,16 +219,20 @@ ga_ioctl_reconfigure_t selectProfile(float loss, float delay, unsigned jitter) /
 			fl::scalar sloss = listInput[i]->getMinimum() + loss + 0.000001;
 			listInput[i]->setInputValue(sloss);
 			std::cout << "adaptive-stream: Loss: " << fl::Op::str(sloss) << std::endl;
-		}else if(listInput[i]->getName() == "Delay"){
-			fl::scalar sdelay = listInput[i]->getMinimum() + delay;
-			listInput[i]->setInputValue(sdelay);
-			std::cout << "adaptive-stream: Delay: " << fl::Op::str(sdelay) << std::endl;
+			stat[0] = fl::Op::str(sloss);
+		}else if(listInput[i]->getName() == "Rtt"){
+			fl::scalar srtt = listInput[i]->getMinimum() + rtt;
+			listInput[i]->setInputValue(srtt);
+			std::cout << "adaptive-stream: RTT: " << fl::Op::str(srtt) << std::endl;
+			stat[1] = fl::Op::str(srtt);
 		}else if(listInput[i]->getName() == "Jitter"){
 			fl::scalar sjitt = listInput[i]->getMinimum() + jitter;
 			listInput[i]->setInputValue(sjitt);
 			std::cout << "adaptive-stream: Jitter: " << fl::Op::str(sjitt) << std::endl;
+			stat[2] = fl::Op::str(sjitt);
 		}
 	}
 	printf("adaptive-stream: ------------------------------------\n");
+	writeLog(stat);
 	return createParam();
 }
