@@ -35,6 +35,14 @@ void writeLog(std::string str[])
 	logfile.close();
 }
 
+void writeLog2(std::string str[])
+{
+	std::ofstream logfile;
+	logfile.open("D:\\adaptive-log2.txt", std::ios::out | std::ios::app);
+	logfile << str[0] << "," << str[1] << std::endl;
+	logfile.close();
+}
+
 void parseTerm(std::string tmp, std::string key, int type, fl::Variable* var)
 {
 	if(type==0)
@@ -198,6 +206,7 @@ ga_ioctl_reconfigure_t createParam()
 		}
 	}
 	printf("adaptive-stream: ------------------------------------\n");
+	
 	ga_ioctl_reconfigure_t params;
 	params.id = 0;
 	params.bitrateKbps = (int) Bitrate;

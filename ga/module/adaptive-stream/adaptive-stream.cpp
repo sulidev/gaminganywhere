@@ -45,6 +45,7 @@ static int adaptive_deinit(void* arg)
 
 void adaptive_apply_param(ga_ioctl_reconfigure_t params)
 {
+	std::string par[2];
 	int err = ga_module_ioctl(vencoder, GA_IOCTL_RECONFIGURE, sizeof(params), &params);
 	printf("adaptive-stream: -----------current parameter--------\n");
 	printf("adaptive-stream: Crf: %d\n", params.crf);
@@ -52,6 +53,9 @@ void adaptive_apply_param(ga_ioctl_reconfigure_t params)
 	printf("adaptive-stream: Vbv-Buffer: %dkbit\n", params.bufsize);
 	printf("adaptive-stream: reconfigure result code: %d\n", err);
 	printf("adaptive-stream: ------------------------------------\n");
+	par[0] = concatStr("",params.crf);
+	par[1] = concatStr("",params.bitrateKbps);
+	writeLog2(par);
 }
 
 void adaptive_reconfigure(float loss, float rtt, unsigned jitter)
