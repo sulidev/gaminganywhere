@@ -1,26 +1,10 @@
-improvement
-===========
-to have adaptive bandwidth streaming. Adaptive here is accomplished by changing media encoding parameter.
+# Disclaimer
+I don't own **gaminganywhere** source code. I improved it to have adaptive bandwidth streaming. Adaptive here is accomplished by changing media encoding parameter based on fuzzy logic.
 
-gaminganywhere
-==============
+_I should have used **fork** instead, but it pains to have it start all over again, sorry :worried:_
 
-GamingAnywhere: An Open Cloud Gaming System
+Please click url below to visit the original web and github sites.
 
-* Overview
-
-GamingAnywhere is an open-source clouding gaming platform. In addition to its
-openness, we design GamingAnywhere for high extensibility, portability, and
-reconfigurability. GamingAnywhere currently supports Windows and Linux, and
-can be ported to other OS's including OS X and Android.
-
-* Documents
-
-Official web site: http://gaminganywhere.org/
-
-Quick start guide: http://gaminganywhere.org/doc/quick_start.html
-
-Configuration file guide: http://gaminganywhere.org/doc/config.html
-
-FAQ: http://gaminganywhere.org/faq.html
-
+# Gaminganywhere
+* [Official web site](http://gaminganywhere.org/)
+* [Official github](https://github.com/chunying/gaminganywhere)
